@@ -1,8 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+"""
+__title__ = ''
+__author__ = 'fdrong'
+__mtime__ = '16/5/17'
+"""
 
 import datetime
-
+from celery.task import task
 from celery.task import periodic_task
 from celery.schedules import timedelta
 from celery.schedules import crontab
@@ -18,3 +23,7 @@ def test_crontab():
 def test_timedelta():
     print("hello timedelta: %s" % datetime.datetime.now())
 
+
+@task
+def test21(data):
+    print data

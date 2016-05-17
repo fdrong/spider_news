@@ -6,12 +6,15 @@ __author__ = 'fdrong'
 __mtime__ = '16/5/16'
 """
 import os
+import re
 import time
 import logging
 import requests
+import urlparse
 import hashlib
 import random
-from datetime import date
+from lxml.etree import HTML
+from datetime import date, datetime
 from logging.handlers import TimedRotatingFileHandler
 
 
@@ -26,6 +29,7 @@ class BaseSpider(object):
         :return:
         """
         retry = 3
+        self.url = url
         while retry:
             try:
                 time.sleep(random.randint(1, 20))
@@ -48,6 +52,25 @@ class BaseSpider(object):
     # 移除\r \t \n 特殊符号
     def remove_tags(self, content):
         return content.replace("\r", "").replace("\t", "").replace("\n", "").strip()
+
+    # 根据xpath进行解析
+    def parse_xpath_content(self, content, xpath_dict):
+        tree = HTML(content)
+        result = dict()
+        for key in xpath_dict.keys():
+            list_content = tree.xpath(xpath_dict[key].replace('tbody/', ''))
+            if list_content:
+                result[key] = "".join(list_content)
+            else:
+                result[key] = ""
+        return result
+
+    def parse_urls(self, content, regex='*.*'):
+        tree = HTML(content)
+        url_list = tree.xpath(u"//a/@href")
+        pattern = re.compile(regex)
+        url_joined_list = [urlparse.urljoin(self.url, url) for url in url_list]
+        return filter(pattern.match, url_joined_list)
 
     def create_logger(self, spidername):
         """
@@ -74,3 +97,12 @@ class BaseSpider(object):
         logger.setLevel(logging.INFO)              # 设置日志级别为DEBUG(级别最低)
 
         return logger
+
+
+spider = BaseSpider("sina_news")
+regex = "^http://news.163.com/%s/%s/\d{2}/\w+.html$" \
+        % (str(datetime.now().year)[2:], "%02d%02d" % (datetime.now().month, datetime.now().day))
+content = spider.get_content("http://www.163.com/")
+url_list = spider.parse_urls(content, regex=regex)
+for url in url_list:
+    print url
