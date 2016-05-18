@@ -5,12 +5,11 @@ __title__ = ''
 __author__ = 'fdrong'
 __mtime__ = '16/5/17'
 """
-from src.task import test21
+from src.task import spider_sina_news
 
 
 def main():
-    data = {"abc":"abc"}
-    test21.delay(data)
+    spider_sina_news.delay()
 
 
 if __name__ == '__main__':
