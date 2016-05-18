@@ -1,4 +1,11 @@
-#coding=utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+__title__ = ''
+__author__ = 'fdrong'
+__mtime__ = '16/5/18'
+"""
+
 
 import pymongo
 
@@ -42,7 +49,7 @@ class MongoDB(object):
         切换数据库
         """
         self.db = self.connection[database]
-        
+
     def find_sort(self, collection, dict_search, field, sortflag='asc'):
         if sortflag == 'desc':
             cursor = self.db[collection].find(dict_search).sort(field, pymongo.ASCENDING)
@@ -52,7 +59,7 @@ class MongoDB(object):
 
     def rename_column(self, collection, sourcename, currentname):
         self.db[collection].update({}, {"$rename":{sourcename:currentname}}, False, True)
-    
+
     def group_by(self, collection="", key={}, condition={}, initial={"count": 0},
                     reduce="function(obj, prev){prev.count++;}"):
 
@@ -66,12 +73,3 @@ class MongoDB(object):
     @staticmethod
     def get_db(self):
         return self.db
-
-
-# def test():
-#     mdb = db_mongodb('183.57.42.116', 27017, "crawl_data")
-#     tt = mdb.db_find_one("chinaweath_20141016", {"cpdjbm":"C1010314005453"})
-#     print tt
-#     lt = mdb.db_group_by("news_content", {"main_id":1})
-#     print lt
-# test()
